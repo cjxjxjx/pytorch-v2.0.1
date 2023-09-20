@@ -1,0 +1,42 @@
+# f32
+--reset
+
+--sdt=f32 --ddt=f32
+# add:f32:per_tensor fails with a single value (numerical issues)
+# dt: -0.150490999, fp: -0.150491238
+--attr-post-ops=,sum,relu,add:f32:common #,add:f32:per_tensor,add:f32:per_oc
+--p=1 --eps=0.0
+--alg=sum,mul,max,min,mean,norm_lp_power_p_sum
+--batch=option_set_ci
+
+--p=2 --eps=0.0
+--alg=norm_lp_sum
+--batch=option_set_ci
+
+--reset
+--sdt=f32 --ddt=f32
+--p=1 --eps=0.0
+--alg=sum,mul,max,min,mean,norm_lp_power_p_sum
+--attr-post-ops=sum+relu+add:f32:common,div:f32:per_oc+add:f32:per_oc+mul:f32:per_oc
+--batch=option_set_ci
+
+--reset
+--sdt=f32 --ddt=f32
+--p=2 --eps=0.0
+--alg=norm_lp_sum
+--attr-post-ops=sum+add:f32:common+abs,add:f32:common+abs+max:f32:per_tensor
+--batch=option_set_ci
+
+--reset
+--sdt=bf16 --ddt=bf16
+--p=1 --eps=0.0
+--alg=sum,mul,max,min,mean,norm_lp_power_p_sum
+--attr-post-ops=min:bf16:per_tensor+sum+add:bf16:common,tanh+logistic+mul:bf16:per_oc
+--batch=option_set_ci
+
+--reset
+--sdt=bf16 --ddt=bf16
+--p=2 --eps=0.0
+--alg=norm_lp_sum
+--attr-post-ops=min:bf16:per_tensor+sum+add:bf16:common,tanh+logistic+mul:bf16:per_oc
+--batch=option_set_ci

@@ -1,0 +1,59 @@
+# main op
+--reset
+--dir=FWD_I,FWD_B,BWD_D,BWD_W
+mb50ic64ih56oc64oh56kh1ph0
+
+# BWD_W with groups
+--reset
+--dir=BWD_W
+g4oc16ic16_ow5iw5kw3pw1_n"1d_conv:grouped"
+
+# post binary
+--reset
+--attr-post-ops=add:f32:common mb50ic64ih56oc64oh56kh1ph0
+--attr-post-ops=add:f32:per_oc mb50ic64ih56oc64oh56kh1ph0
+
+# post sum
+--reset
+--attr-post-ops=sum mb50ic64ih56oc64oh56kh1ph0
+
+# post eltwise
+--reset
+--attr-post-ops=logistic,relu,mish mb50ic64ih56oc64oh56kh1ph0
+
+# post sum+eltwise
+--reset
+--attr-post-ops=sum+relu mb50ic64ih56oc64oh56kh1ph0
+
+# post bias
+--reset
+--dir=FWD_B mb50ic64ih56oc64oh56kh1ph0
+
+# acdeb correctness test case
+--reset
+--mode=c
+--dir=FWD_B,BWD_D,BWD_W
+--stag=acdeb
+--wtag=any
+--dtag=acdeb
+g1mb1ic3id116ih132iw132oc32od114oh130ow130kd3kh3kw3sd1sh1sw1pd0ph0pw0dd0dh0dw0n"3d_unet:conv_1"
+
+# int8
+--reset
+--cfg=u8s8u8,u8s8s8 --dir=FWD_I --attr-oscale=per_oc:2.25 mb50ic64ih56oc64oh56kh1ph0
+
+# int8 post sum with scale,zp and post relu
+--reset
+--cfg=u8s8u8 --attr-oscale=per_oc:1 --attr-post-ops=sum:0.0137735:3+relu mb32ic64ih56iw56oc256oh56ow56kh1kw1sh1sw1ph0pw0dh0dw0
+
+# main op
+--reset
+--dir=FWD_B,BWD_D,BWD_W
+--cfg=bf16bf16bf16
+mb50ic64ih56oc64oh56kh1ph0
+
+# fpmath mode control
+--reset
+--dir=FWD_I
+--attr-fpmath=strict,bf16,tf32
+mb50ic64ih56oc64oh56kh1ph0
